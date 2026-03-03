@@ -325,7 +325,7 @@ impl App {
                 EffectTimer::from_ms(500, Interpolation::CubicOut),
             ),
             _ => fx::fade_from(
-                Color::Rgb(0, 40, 0),
+                Color::Rgb(30, 20, 5),
                 Color::Black,
                 EffectTimer::from_ms(350, Interpolation::Linear),
             ),
@@ -579,7 +579,7 @@ impl App {
             for x in area.x..area.right() {
                 let pos = Position::new(x, y);
                 if let Some(cell) = buf.cell_mut(pos) {
-                    // Procedural calming wave pattern
+                    // Procedural calming wave pattern — warm gold/copper tones
                     let fx = x as f64 * 0.15;
                     let fy = y as f64 * 0.3;
                     let ft = tick as f64 * 0.02;
@@ -590,15 +590,15 @@ impl App {
 
                     let intensity = wave1 + wave2 + wave3;
 
-                    let r = (5.0 + intensity * 12.0) as u8;
-                    let g = (10.0 + intensity * 25.0) as u8;
-                    let b = (15.0 + intensity * 18.0) as u8;
+                    let r = (12.0 + intensity * 22.0) as u8;
+                    let g = (8.0 + intensity * 15.0) as u8;
+                    let b = (4.0 + intensity * 8.0) as u8;
 
                     cell.set_bg(Color::Rgb(r, g, b));
                     cell.set_fg(Color::Rgb(
-                        (r as u16 + 15).min(255) as u8,
-                        (g as u16 + 25).min(255) as u8,
-                        (b as u16 + 15).min(255) as u8,
+                        (r as u16 + 18).min(255) as u8,
+                        (g as u16 + 12).min(255) as u8,
+                        (b as u16 + 6).min(255) as u8,
                     ));
                 }
             }
@@ -615,7 +615,7 @@ impl App {
                     Span::styled(" ", Style::default()),
                     Span::styled(
                         p.title(),
-                        Style::default().fg(Color::Rgb(180, 220, 180)),
+                        Style::default().fg(Color::Rgb(192, 192, 185)),
                     ),
                     Span::styled(" ", Style::default()),
                 ])
@@ -626,15 +626,15 @@ impl App {
             .block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(60, 80, 60))
+                    .border_style(Color::Rgb(80, 65, 35))
                     .title(" gold.silver.copper ")
-                    .title_style(Style::default().fg(Color::Rgb(100, 200, 100)).bold()),
+                    .title_style(Style::default().fg(Color::Rgb(207, 181, 59)).bold()),
             )
             .select(self.page.index())
-            .style(Style::default().fg(Color::Rgb(140, 140, 140)))
+            .style(Style::default().fg(Color::Rgb(140, 130, 110)))
             .highlight_style(
                 Style::default()
-                    .fg(Color::Rgb(100, 200, 100))
+                    .fg(Color::Rgb(207, 181, 59))
                     .bold()
                     .add_modifier(Modifier::UNDERLINED),
             )
@@ -646,11 +646,11 @@ impl App {
     fn render_home(&self, frame: &mut Frame, area: Rect) {
         let block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(60, 80, 60))
+            .border_style(Color::Rgb(80, 65, 35))
             .title_bottom(
                 Line::from("│ click tabs to navigate │")
                     .alignment(Alignment::Right)
-                    .style(Style::default().fg(Color::Rgb(60, 80, 60))),
+                    .style(Style::default().fg(Color::Rgb(80, 65, 35))),
             );
 
         let inner = block.inner(area);
@@ -669,18 +669,18 @@ impl App {
         // Banner
         let banner = Paragraph::new(BANNER)
             .alignment(Alignment::Center)
-            .style(Style::default().fg(Color::Rgb(100, 200, 100)).bold());
+            .style(Style::default().fg(Color::Rgb(207, 181, 59)).bold());
         frame.render_widget(banner, banner_area);
 
         // Description
         let desc = Paragraph::new(DESCRIPTION)
             .wrap(Wrap { trim: false })
-            .style(Style::default().fg(Color::Rgb(180, 180, 180)))
+            .style(Style::default().fg(Color::Rgb(192, 192, 185)))
             .block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(50, 70, 50))
-                    .title(" About ".bold().fg(Color::Rgb(100, 200, 100))),
+                    .border_style(Color::Rgb(50, 40, 25))
+                    .title(" About ".bold().fg(Color::Rgb(207, 181, 59))),
             );
         frame.render_widget(desc, desc_area);
 
@@ -688,30 +688,30 @@ impl App {
         let nav_text = Text::from(vec![
             Line::from(""),
             Line::from(vec![
-                "  Click the ".fg(Color::Rgb(120, 120, 120)),
-                "tabs above".fg(Color::Rgb(100, 200, 100)).bold(),
-                " to navigate between pages".fg(Color::Rgb(120, 120, 120)),
+                "  Click the ".fg(Color::Rgb(130, 120, 100)),
+                "tabs above".fg(Color::Rgb(207, 181, 59)).bold(),
+                " to navigate between pages".fg(Color::Rgb(130, 120, 100)),
             ]),
             Line::from(vec![
-                "  Try the ".fg(Color::Rgb(120, 120, 120)),
-                "REPL".fg(Color::Rgb(100, 200, 100)).bold(),
+                "  Try the ".fg(Color::Rgb(130, 120, 100)),
+                "REPL".fg(Color::Rgb(184, 115, 51)).bold(),
                 " to evaluate Grift expressions interactively"
-                    .fg(Color::Rgb(120, 120, 120)),
+                    .fg(Color::Rgb(130, 120, 100)),
             ]),
             Line::from(vec![
-                "  All ".fg(Color::Rgb(120, 120, 120)),
-                "links".fg(Color::Rgb(100, 200, 100)).bold(),
-                " and ".fg(Color::Rgb(120, 120, 120)),
-                "buttons".fg(Color::Rgb(100, 200, 100)).bold(),
-                " are clickable".fg(Color::Rgb(120, 120, 120)),
+                "  All ".fg(Color::Rgb(130, 120, 100)),
+                "links".fg(Color::Rgb(192, 192, 185)).bold(),
+                " and ".fg(Color::Rgb(130, 120, 100)),
+                "buttons".fg(Color::Rgb(192, 192, 185)).bold(),
+                " are clickable".fg(Color::Rgb(130, 120, 100)),
             ]),
         ]);
         frame.render_widget(
             Paragraph::new(nav_text).block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(50, 70, 50))
-                    .title(" Navigation ".bold().fg(Color::Rgb(100, 200, 100))),
+                    .border_style(Color::Rgb(50, 40, 25))
+                    .title(" Navigation ".bold().fg(Color::Rgb(207, 181, 59))),
             ),
             nav_area,
         );
@@ -720,12 +720,12 @@ impl App {
     fn render_repl(&self, frame: &mut Frame, area: Rect) {
         let block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(100, 200, 100))
-            .title(" Grift REPL ".bold().fg(Color::Rgb(100, 200, 100)))
+            .border_style(Color::Rgb(184, 115, 51))
+            .title(" Grift REPL ".bold().fg(Color::Rgb(184, 115, 51)))
             .title_bottom(
                 Line::from("│ Type expressions and press Enter to evaluate │")
                     .alignment(Alignment::Center)
-                    .style(Style::default().fg(Color::Rgb(60, 80, 60))),
+                    .style(Style::default().fg(Color::Rgb(80, 65, 35))),
             );
 
         let inner = block.inner(area);
@@ -740,24 +740,24 @@ impl App {
             history_lines.push(Line::from(vec![
                 Span::styled(
                     "grift> ",
-                    Style::default().fg(Color::Rgb(100, 200, 100)).bold(),
+                    Style::default().fg(Color::Rgb(184, 115, 51)).bold(),
                 ),
-                Span::styled(input.as_str(), Style::default().fg(Color::Rgb(200, 200, 200))),
+                Span::styled(input.as_str(), Style::default().fg(Color::Rgb(192, 192, 185))),
             ]));
             history_lines.push(Line::from(vec![Span::styled(
                 format!("  => {output}"),
-                Style::default().fg(Color::Rgb(180, 180, 100)),
+                Style::default().fg(Color::Rgb(184, 160, 80)),
             )]));
         }
 
         if history_lines.is_empty() {
             history_lines.push(Line::from(
                 "  Welcome to the Grift REPL! Type expressions and press Enter."
-                    .fg(Color::Rgb(120, 120, 120)),
+                    .fg(Color::Rgb(130, 120, 100)),
             ));
             history_lines.push(Line::from(
                 "  Try: (+ 1 2), (list 1 2 3), (define! x 42)"
-                    .fg(Color::Rgb(120, 120, 120)),
+                    .fg(Color::Rgb(130, 120, 100)),
             ));
         }
 
@@ -771,20 +771,20 @@ impl App {
             .block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(50, 70, 50))
-                    .title(" Output ".fg(Color::Rgb(180, 180, 100))),
+                    .border_style(Color::Rgb(50, 40, 25))
+                    .title(" Output ".fg(Color::Rgb(184, 160, 80))),
             );
         frame.render_widget(history, history_area);
 
         // Input
         let input_display = format!("grift> {}", self.repl_input);
         let input = Paragraph::new(input_display.as_str())
-            .style(Style::default().fg(Color::Rgb(200, 200, 200)))
+            .style(Style::default().fg(Color::Rgb(192, 192, 185)))
             .block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(100, 200, 100))
-                    .title(" Input ".bold().fg(Color::Rgb(100, 200, 100))),
+                    .border_style(Color::Rgb(184, 115, 51))
+                    .title(" Input ".bold().fg(Color::Rgb(184, 115, 51))),
             );
         frame.render_widget(input, input_area);
 
@@ -808,11 +808,11 @@ impl App {
 
         let block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(60, 80, 60))
+            .border_style(Color::Rgb(80, 65, 35))
             .title(
                 format!(" Documentation: {} ", doc_titles[self.doc_page])
                     .bold()
-                    .fg(Color::Rgb(100, 200, 100)),
+                    .fg(Color::Rgb(207, 181, 59)),
             );
 
         let inner = block.inner(area);
@@ -830,59 +830,59 @@ impl App {
                     if let Some((code, comment)) = line.split_once(';') {
                         if let Some((expr, result)) = code.split_once("=>") {
                             Line::from(vec![
-                                Span::styled(expr, Style::default().fg(Color::Rgb(200, 200, 200))),
-                                Span::styled("=>", Style::default().fg(Color::Rgb(80, 80, 80))),
+                                Span::styled(expr, Style::default().fg(Color::Rgb(192, 192, 185))),
+                                Span::styled("=>", Style::default().fg(Color::Rgb(100, 85, 50))),
                                 Span::styled(
                                     result,
-                                    Style::default().fg(Color::Rgb(180, 180, 100)),
+                                    Style::default().fg(Color::Rgb(184, 160, 80)),
                                 ),
                                 Span::styled(
                                     format!(";{comment}"),
-                                    Style::default().fg(Color::Rgb(100, 100, 100)),
+                                    Style::default().fg(Color::Rgb(100, 90, 70)),
                                 ),
                             ])
                         } else {
                             Line::from(vec![
-                                Span::styled(code, Style::default().fg(Color::Rgb(200, 200, 200))),
+                                Span::styled(code, Style::default().fg(Color::Rgb(192, 192, 185))),
                                 Span::styled(
                                     format!(";{comment}"),
-                                    Style::default().fg(Color::Rgb(100, 100, 100)),
+                                    Style::default().fg(Color::Rgb(100, 90, 70)),
                                 ),
                             ])
                         }
                     } else if let Some((expr, result)) = line.split_once("=>") {
                         Line::from(vec![
-                            Span::styled(expr, Style::default().fg(Color::Rgb(200, 200, 200))),
-                            Span::styled("=>", Style::default().fg(Color::Rgb(80, 80, 80))),
-                            Span::styled(result, Style::default().fg(Color::Rgb(180, 180, 100))),
+                            Span::styled(expr, Style::default().fg(Color::Rgb(192, 192, 185))),
+                            Span::styled("=>", Style::default().fg(Color::Rgb(100, 85, 50))),
+                            Span::styled(result, Style::default().fg(Color::Rgb(184, 160, 80))),
                         ])
                     } else {
-                        Line::styled(line, Style::default().fg(Color::Rgb(200, 200, 200)))
+                        Line::styled(line, Style::default().fg(Color::Rgb(192, 192, 185)))
                     }
                 } else if line.starts_with("  ") && !line.trim().is_empty() {
                     if let Some((code, comment)) = line.split_once(';') {
                         Line::from(vec![
-                            Span::styled(code, Style::default().fg(Color::Rgb(200, 200, 200))),
+                            Span::styled(code, Style::default().fg(Color::Rgb(192, 192, 185))),
                             Span::styled(
                                 format!(";{comment}"),
-                                Style::default().fg(Color::Rgb(100, 100, 100)),
+                                Style::default().fg(Color::Rgb(100, 90, 70)),
                             ),
                         ])
                     } else if let Some((expr, result)) = line.split_once("=>") {
                         Line::from(vec![
-                            Span::styled(expr, Style::default().fg(Color::Rgb(200, 200, 200))),
-                            Span::styled("=>", Style::default().fg(Color::Rgb(80, 80, 80))),
-                            Span::styled(result, Style::default().fg(Color::Rgb(180, 180, 100))),
+                            Span::styled(expr, Style::default().fg(Color::Rgb(192, 192, 185))),
+                            Span::styled("=>", Style::default().fg(Color::Rgb(100, 85, 50))),
+                            Span::styled(result, Style::default().fg(Color::Rgb(184, 160, 80))),
                         ])
                     } else {
-                        Line::styled(line, Style::default().fg(Color::Rgb(200, 200, 200)))
+                        Line::styled(line, Style::default().fg(Color::Rgb(192, 192, 185)))
                     }
                 } else if line.contains('─') {
-                    Line::styled(line, Style::default().fg(Color::Rgb(100, 200, 100)))
+                    Line::styled(line, Style::default().fg(Color::Rgb(207, 181, 59)))
                 } else if !line.trim().is_empty() {
                     Line::styled(
                         line,
-                        Style::default().fg(Color::Rgb(100, 200, 100)).bold(),
+                        Style::default().fg(Color::Rgb(207, 181, 59)).bold(),
                     )
                 } else {
                     Line::from("")
@@ -905,32 +905,32 @@ impl App {
         self.doc_nav_next = next_area;
 
         let prev_style = if self.doc_page > 0 {
-            Style::default().fg(Color::Rgb(100, 200, 100)).bold()
+            Style::default().fg(Color::Rgb(207, 181, 59)).bold()
         } else {
-            Style::default().fg(Color::Rgb(60, 60, 60))
+            Style::default().fg(Color::Rgb(60, 50, 30))
         };
         let next_style = if self.doc_page < 2 {
-            Style::default().fg(Color::Rgb(100, 200, 100)).bold()
+            Style::default().fg(Color::Rgb(207, 181, 59)).bold()
         } else {
-            Style::default().fg(Color::Rgb(60, 60, 60))
+            Style::default().fg(Color::Rgb(60, 50, 30))
         };
 
         frame.render_widget(
             Paragraph::new(" [◄ Prev]").style(prev_style).block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(50, 70, 50)),
+                    .border_style(Color::Rgb(50, 40, 25)),
             ),
             prev_area,
         );
         frame.render_widget(
             Paragraph::new(format!(" Page {}/{} ", self.doc_page + 1, doc_titles.len()))
                 .alignment(Alignment::Center)
-                .style(Style::default().fg(Color::Rgb(100, 100, 100)))
+                .style(Style::default().fg(Color::Rgb(130, 120, 100)))
                 .block(
                     Block::bordered()
                         .border_type(BorderType::Rounded)
-                        .border_style(Color::Rgb(50, 70, 50)),
+                        .border_style(Color::Rgb(50, 40, 25)),
                 ),
             info_area,
         );
@@ -938,7 +938,7 @@ impl App {
             Paragraph::new(" [Next ►]").style(next_style).block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .border_style(Color::Rgb(50, 70, 50)),
+                    .border_style(Color::Rgb(50, 40, 25)),
             ),
             next_area,
         );
@@ -947,12 +947,12 @@ impl App {
     fn render_blog(&mut self, frame: &mut Frame, area: Rect) {
         let block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(60, 80, 60))
-            .title(" Blog ".bold().fg(Color::Rgb(100, 200, 100)))
+            .border_style(Color::Rgb(80, 65, 35))
+            .title(" Blog ".bold().fg(Color::Rgb(207, 181, 59)))
             .title_bottom(
                 Line::from("│ click a post to read │")
                     .alignment(Alignment::Center)
-                    .style(Style::default().fg(Color::Rgb(60, 80, 60))),
+                    .style(Style::default().fg(Color::Rgb(80, 65, 35))),
             );
 
         let inner = block.inner(area);
@@ -968,23 +968,23 @@ impl App {
             .enumerate()
             .map(|(i, (title, date, _))| {
                 let style = if i == self.blog_index {
-                    Style::default().fg(Color::Rgb(100, 200, 100)).bold()
+                    Style::default().fg(Color::Rgb(207, 181, 59)).bold()
                 } else {
-                    Style::default().fg(Color::Rgb(150, 150, 150))
+                    Style::default().fg(Color::Rgb(160, 150, 130))
                 };
                 let marker = if i == self.blog_index { "▶ " } else { "  " };
                 ListItem::new(vec![
                     Line::from(format!("{marker}{title}")).style(style),
                     Line::from(format!("  {date}"))
-                        .style(Style::default().fg(Color::Rgb(80, 80, 80))),
+                        .style(Style::default().fg(Color::Rgb(100, 90, 70))),
                 ])
             })
             .collect();
 
         let list_block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(50, 70, 50))
-            .title(" Posts ".fg(Color::Rgb(100, 200, 100)));
+            .border_style(Color::Rgb(50, 40, 25))
+            .title(" Posts ".fg(Color::Rgb(207, 181, 59)));
 
         let list_inner = list_block.inner(list_area);
         // Each blog item is 2 lines tall
@@ -1008,19 +1008,19 @@ impl App {
             let mut lines = vec![
                 Line::styled(
                     *title,
-                    Style::default().fg(Color::Rgb(100, 200, 100)).bold(),
+                    Style::default().fg(Color::Rgb(207, 181, 59)).bold(),
                 ),
-                Line::styled(*date, Style::default().fg(Color::Rgb(80, 80, 80))),
+                Line::styled(*date, Style::default().fg(Color::Rgb(100, 90, 70))),
                 Line::styled(
                     "─".repeat(content_area.width.saturating_sub(4) as usize),
-                    Style::default().fg(Color::Rgb(50, 70, 50)),
+                    Style::default().fg(Color::Rgb(50, 40, 25)),
                 ),
                 Line::from(""),
             ];
             for line in content.lines() {
                 lines.push(Line::styled(
                     line,
-                    Style::default().fg(Color::Rgb(180, 180, 180)),
+                    Style::default().fg(Color::Rgb(192, 192, 185)),
                 ));
             }
 
@@ -1029,7 +1029,7 @@ impl App {
                 .block(
                     Block::bordered()
                         .border_type(BorderType::Rounded)
-                        .border_style(Color::Rgb(50, 70, 50)),
+                        .border_style(Color::Rgb(50, 40, 25)),
                 );
             frame.render_widget(blog, content_area);
         }
@@ -1038,12 +1038,12 @@ impl App {
     fn render_links(&mut self, frame: &mut Frame, area: Rect) {
         let block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(60, 80, 60))
-            .title(" Links ".bold().fg(Color::Rgb(100, 200, 100)))
+            .border_style(Color::Rgb(80, 65, 35))
+            .title(" Links ".bold().fg(Color::Rgb(207, 181, 59)))
             .title_bottom(
                 Line::from("│ click a link to open │")
                     .alignment(Alignment::Center)
-                    .style(Style::default().fg(Color::Rgb(60, 80, 60))),
+                    .style(Style::default().fg(Color::Rgb(80, 65, 35))),
             );
 
         let inner = block.inner(area);
@@ -1056,8 +1056,8 @@ impl App {
         // Links with hyperlinks
         let links_block = Block::bordered()
             .border_type(BorderType::Rounded)
-            .border_style(Color::Rgb(50, 70, 50))
-            .title(" Repositories & Resources ".fg(Color::Rgb(100, 200, 100)));
+            .border_style(Color::Rgb(50, 40, 25))
+            .title(" Repositories & Resources ".fg(Color::Rgb(207, 181, 59)));
 
         let links_inner = links_block.inner(links_area);
         frame.render_widget(links_block, links_area);
@@ -1077,34 +1077,34 @@ impl App {
         let info_text = Text::from(vec![
             Line::from(""),
             Line::from(vec![
-                "  gold.silver.copper ".fg(Color::Rgb(100, 200, 100)).bold(),
+                "  gold.silver.copper ".fg(Color::Rgb(207, 181, 59)).bold(),
                 "— Software developer & language designer"
-                    .fg(Color::Rgb(150, 150, 150)),
+                    .fg(Color::Rgb(160, 150, 130)),
             ]),
             Line::from(""),
             Line::from(vec![
-                "  Grift ".fg(Color::Rgb(100, 200, 100)).bold(),
+                "  Grift ".fg(Color::Rgb(184, 115, 51)).bold(),
                 "– A minimalistic Lisp implementing vau calculus"
-                    .fg(Color::Rgb(150, 150, 150)),
+                    .fg(Color::Rgb(160, 150, 130)),
             ]),
             Line::from(vec![
-                "  Ratzilla ".fg(Color::Rgb(100, 200, 100)).bold(),
+                "  Ratzilla ".fg(Color::Rgb(192, 192, 185)).bold(),
                 "– Terminal-themed web apps with Rust + WASM"
-                    .fg(Color::Rgb(150, 150, 150)),
+                    .fg(Color::Rgb(160, 150, 130)),
             ]),
             Line::from(vec![
-                "  TachyonFX ".fg(Color::Rgb(100, 200, 100)).bold(),
+                "  TachyonFX ".fg(Color::Rgb(192, 192, 185)).bold(),
                 "– Shader-like effects for terminal UIs"
-                    .fg(Color::Rgb(150, 150, 150)),
+                    .fg(Color::Rgb(160, 150, 130)),
             ]),
             Line::from(""),
             Line::from(
                 "  This website is entirely rendered as a terminal UI in your browser."
-                    .fg(Color::Rgb(100, 100, 100)),
+                    .fg(Color::Rgb(130, 120, 100)),
             ),
             Line::from(
                 "  Powered by Ratzilla + TachyonFX + WebAssembly."
-                    .fg(Color::Rgb(100, 100, 100)),
+                    .fg(Color::Rgb(130, 120, 100)),
             ),
         ]);
         frame.render_widget(
@@ -1113,8 +1113,8 @@ impl App {
                 .block(
                     Block::bordered()
                         .border_type(BorderType::Rounded)
-                        .border_style(Color::Rgb(50, 70, 50))
-                        .title(" Info ".fg(Color::Rgb(100, 200, 100))),
+                        .border_style(Color::Rgb(50, 40, 25))
+                        .title(" Info ".fg(Color::Rgb(207, 181, 59))),
                 ),
             info_area,
         );
