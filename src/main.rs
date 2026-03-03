@@ -14,6 +14,11 @@ use ratzilla::WebRenderer;
 use tachyonfx::fx::{self};
 use tachyonfx::{Duration, Effect, EffectRenderer, EffectTimer, Interpolation, Motion, SimpleRng};
 
+const TRAIL_INITIAL_INTENSITY: u8 = 200;
+const MAX_TRAIL_LENGTH: usize = 30;
+const TRAIL_FADE_RATE: u8 = 8;
+const CURSOR_BLINK_RATE: u64 = 30;
+
 const BANNER: &str = r#"
   ██████╗ ██████╗ ██╗███████╗████████╗   ██████╗ ███████╗
  ██╔════╝ ██╔══██╗██║██╔════╝╚══██╔══╝   ██╔══██╗██╔════╝
@@ -421,9 +426,9 @@ impl App {
             self.mouse_moving = true;
             self.mouse_idle_ticks = 0;
             // Add trail point
-            self.trail.push((col, row, 200));
+            self.trail.push((col, row, TRAIL_INITIAL_INTENSITY));
             // Keep trail limited
-            if self.trail.len() > 30 {
+            if self.trail.len() > MAX_TRAIL_LENGTH {
                 self.trail.remove(0);
             }
         }
@@ -624,7 +629,7 @@ impl App {
         }
         // Fade trail points
         self.trail.retain_mut(|(_, _, intensity)| {
-            *intensity = intensity.saturating_sub(8);
+            *intensity = intensity.saturating_sub(TRAIL_FADE_RATE);
             *intensity > 0
         });
 
@@ -698,7 +703,7 @@ impl App {
             for &(tx, ty, intensity) in &self.trail {
                 let pos = Position::new(tx, ty);
                 if let Some(cell) = buf.cell_mut(pos) {
-                    let boost = (intensity as u16 / 8) as u8;
+                    let boost = (intensity as u16 / TRAIL_FADE_RATE as u16) as u8;
                     let (r, g, b) = match cell.bg {
                         Color::Rgb(r, g, b) => (r, g, b),
                         _ => (8, 9, 14),
@@ -989,7 +994,7 @@ impl App {
     fn render_blinking_cursor(&self, frame: &mut Frame, cursor_x: u16, cursor_y: u16, max_x: u16) {
         if cursor_x < max_x {
             // Slow blink: visible ~60% of the time
-            let blink_on = (self.cursor_blink_tick / 30) % 2 == 0;
+            let blink_on = (self.cursor_blink_tick / CURSOR_BLINK_RATE).is_multiple_of(2);
             if blink_on {
                 let buf = frame.buffer_mut();
                 let pos = Position::new(cursor_x, cursor_y);
@@ -1385,53 +1390,30 @@ fn main() -> std::io::Result<()> {
     let app = Rc::new(RefCell::new(App::new()));
 
     // Try WebGL2 first, fall back to Canvas. Never use DOM.
+    macro_rules! setup_terminal {
+        ($terminal:expr, $app:expr) => {{
+            $terminal.on_key_event({
+                let app = $app.clone();
+                move |key_event| { app.borrow_mut().handle_key_event(key_event); }
+            });
+            $terminal.on_mouse_event({
+                let app = $app.clone();
+                move |mouse_event| { app.borrow_mut().handle_mouse_event(mouse_event); }
+            });
+            $terminal.draw_web({
+                let app = $app.clone();
+                move |frame| { app.borrow_mut().draw(frame); }
+            });
+        }};
+    }
+
     if let Ok(backend) = WebGl2Backend::new() {
         let terminal = ratzilla::ratatui::Terminal::new(backend)?;
-
-        terminal.on_key_event({
-            let app = app.clone();
-            move |key_event| {
-                app.borrow_mut().handle_key_event(key_event);
-            }
-        });
-
-        terminal.on_mouse_event({
-            let app = app.clone();
-            move |mouse_event| {
-                app.borrow_mut().handle_mouse_event(mouse_event);
-            }
-        });
-
-        terminal.draw_web({
-            let app = app.clone();
-            move |frame| {
-                app.borrow_mut().draw(frame);
-            }
-        });
+        setup_terminal!(terminal, app);
     } else {
         let backend = CanvasBackend::new().expect("failed to create Canvas backend");
         let terminal = ratzilla::ratatui::Terminal::new(backend)?;
-
-        terminal.on_key_event({
-            let app = app.clone();
-            move |key_event| {
-                app.borrow_mut().handle_key_event(key_event);
-            }
-        });
-
-        terminal.on_mouse_event({
-            let app = app.clone();
-            move |mouse_event| {
-                app.borrow_mut().handle_mouse_event(mouse_event);
-            }
-        });
-
-        terminal.draw_web({
-            let app = app.clone();
-            move |frame| {
-                app.borrow_mut().draw(frame);
-            }
-        });
+        setup_terminal!(terminal, app);
     }
 
     Ok(())
