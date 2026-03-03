@@ -1085,7 +1085,8 @@ impl App {
         frame.render_widget(history, history_area);
 
         // Input line
-        let input_display = format!("Λ> {}", self.repl_input);        let input = Paragraph::new(input_display.as_str())
+        let input_display = format!("Λ> {}", self.repl_input);
+        let input = Paragraph::new(input_display.as_str())
             .style(Style::default().fg(Color::Rgb(200, 200, 210)));
         frame.render_widget(input, input_area);
 
