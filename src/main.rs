@@ -264,6 +264,7 @@ struct App {
     last_frame: web_time::Instant,
     // Clickable area tracking
     tab_area: Rect,
+    tab_rects: Vec<Rect>,
     link_areas: Vec<Rect>,
     blog_item_areas: Vec<Rect>,
     doc_nav_prev: Rect,
@@ -287,6 +288,7 @@ impl App {
             rng: SimpleRng::default(),
             last_frame: web_time::Instant::now(),
             tab_area: Rect::default(),
+            tab_rects: Vec::new(),
             link_areas: Vec::new(),
             blog_item_areas: Vec::new(),
             doc_nav_prev: Rect::default(),
@@ -355,19 +357,18 @@ impl App {
             let col = (event.x / PIXELS_PER_COLUMN) as u16;
             let row = (event.y / PIXELS_PER_ROW) as u16;
 
-            // Check tab clicks
+            // Check tab clicks using individual tab areas
             if row >= self.tab_area.y && row < self.tab_area.bottom() {
-                let tab_width = if self.tab_area.width > 0 {
-                    self.tab_area.width / Page::ALL.len() as u16
-                } else {
-                    0
-                };
-                if tab_width > 0 && col >= self.tab_area.x && col < self.tab_area.right() {
-                    let rel_x = col - self.tab_area.x;
-                    let tab_idx = (rel_x / tab_width) as usize;
-                    if tab_idx < Page::ALL.len() {
-                        self.switch_page(Page::ALL[tab_idx]);
-                        return;
+                for (i, tab_rect) in self.tab_rects.iter().enumerate() {
+                    if col >= tab_rect.x
+                        && col < tab_rect.right()
+                        && row >= tab_rect.y
+                        && row < tab_rect.bottom()
+                    {
+                        if i < Page::ALL.len() {
+                            self.switch_page(Page::ALL[i]);
+                            return;
+                        }
                     }
                 }
             }
@@ -621,6 +622,22 @@ impl App {
                 ])
             })
             .collect();
+
+        // Compute individual tab click areas based on actual rendered positions.
+        // Tabs widget renders: padding(1) + title_line + padding(1) for each tab,
+        // separated by a divider. The block border adds 1 column on each side.
+        let divider_width: u16 = 3; // " │ "
+        let tab_padding: u16 = 2; // 1 space padding on each side added by Tabs widget
+        let inner_x = area.x + 1; // skip left border
+        let tab_row = area.y + 1; // the tabs render on the second row (inside border)
+        self.tab_rects.clear();
+        let mut pos = inner_x;
+        for p in &Page::ALL {
+            let title_len = p.title().len() as u16 + 2; // " " + title + " " from our Line
+            let total = title_len + tab_padding;
+            self.tab_rects.push(Rect::new(pos, tab_row, total, 1));
+            pos += total + divider_width;
+        }
 
         let tabs = Tabs::new(titles)
             .block(
